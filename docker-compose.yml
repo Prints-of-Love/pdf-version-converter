@@ -1,0 +1,8 @@
+services:
+  php:
+    build: ./
+    volumes:
+      - ./:/var/www/html
+    working_dir: /var/www/html
+    restart: unless-stopped
+    command: "tail -f /dev/null"

@@ -10,27 +10,22 @@
  */
 namespace Xthiago\PDFVersionConverter\Converter;
 
-use \PHPUnit_Framework_TestCase;
-use Prophecy\Argument;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Filesystem\Filesystem;
 
 /**
  * @author Thiago Rodrigues <xthiago@gmail.com>
  */
-class GhostscriptConverterTest extends PHPUnit_Framework_TestCase
+class GhostscriptConverterTest extends TestCase
 {
     protected $tmp;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tmp = __DIR__.'/../files/stage/';
 
         if (!file_exists($this->tmp))
             mkdir($this->tmp);
-    }
-
-    protected function tearDown()
-    {
     }
 
     /**
@@ -39,38 +34,39 @@ class GhostscriptConverterTest extends PHPUnit_Framework_TestCase
      *
      * @dataProvider filesProvider
      */
-    public function testMustConvertPDFVersionWithSuccess($file, $newVersion)
+    public function testMustConvertPDFVersionWithSuccess(string $file, string $newVersion): void
     {
-        $fs = $this->prophesize('\Symfony\Component\Filesystem\Filesystem');
-        $fs->exists(Argument::type('string'))
-           ->willReturn(true)
-           ->shouldBeCalled()
-        ;
-        $fs->copy(
-                Argument::type('string'),
-                $file,
-                true
-            )
-            ->willReturn(true)
-            ->shouldBeCalled()
-        ;
+        $fs = $this->createMock(Filesystem::class);
 
-        $command = $this->prophesize('Xthiago\PDFVersionConverter\Converter\GhostscriptConverterCommand');
-        $command->run(
-                $file,
-                Argument::type('string'),
-                $newVersion
-            )
-            ->willReturn(null)
-            ->shouldBeCalled()
-        ;
+        $fs->expects($this->once())
+            ->method('exists')
+            ->with($this->isType('string'))
+            ->willReturn(true);
 
-        $converter = new GhostscriptConverter(
-            $command->reveal(),
-            $fs->reveal(),
+        $fs->expects($this->once())
+            ->method('copy')
+            ->with(
+                $this->isType('string'),
+                $this->equalTo($file),
+                $this->equalTo(true)
+            );
+
+        $command = $this->createMock(\Xthiago\PDFVersionConverter\Converter\GhostscriptConverterCommand::class);
+
+        $command->expects($this->once())
+            ->method('run')
+            ->with(
+                $this->equalTo($file),
+                $this->isType('string'),
+                $this->equalTo($newVersion)
+            )
+            ->willReturn(null);
+
+        $converter = new \Xthiago\PDFVersionConverter\Converter\GhostscriptConverter(
+            $command,
+            $fs,
             $this->tmp
         );
-
         $converter->convert($file, $newVersion);
     }
 

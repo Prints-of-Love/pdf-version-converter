@@ -10,13 +10,13 @@
  */
 namespace Xthiago\PDFVersionConverter\Converter;
 
-use \PHPUnit_Framework_TestCase;
+use PHPUnit\Framework\TestCase;
 use Xthiago\PDFVersionConverter\Guesser\RegexGuesser;
 
 /**
  * @author Thiago Rodrigues <xthiago@gmail.com>
  */
-class GhostscriptConverterCommandTest extends PHPUnit_Framework_TestCase
+class GhostscriptConverterCommandTest extends TestCase
 {
     protected $tmp;
 
@@ -34,7 +34,7 @@ class GhostscriptConverterCommandTest extends PHPUnit_Framework_TestCase
         'v2.0.pdf',
     );
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->tmp = __DIR__.'/../files/stage/';
 
@@ -52,7 +52,7 @@ class GhostscriptConverterCommandTest extends PHPUnit_Framework_TestCase
         }
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         foreach($this->files as $file) {
             unlink($this->tmp . $file);
@@ -87,12 +87,13 @@ class GhostscriptConverterCommandTest extends PHPUnit_Framework_TestCase
      * @param $newVersion
      *
      * @dataProvider invalidFilesProvider
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testMustThrowException($invalidFile, $newVersion)
     {
         $tmpFile = $this->tmp .'/'. uniqid('pdf_version_changer_test_') . '.pdf';
-
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unrecoverable error, exit code 1');
         $command = new GhostscriptConverterCommand();
         $command->run(
             $invalidFile,

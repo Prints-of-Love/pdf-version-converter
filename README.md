@@ -68,4 +68,9 @@ Is really simple add new implementation of guesser or converter, just implement 
 
 ## Running unit tests
 
-Run `phpunit -c tests`.
+- Start the docker container with: `docker-compose up`
+  (if there have been updates to the Dockerfile, you'll need to run `docker-compose build` to get the latest updates)
+- While the containers are running, you can run `docker-compose exec php make build test` to install composer deps and run the test suite.
+
+For actual development, just exec into the container (`docker-compose exec php bash`) and run `./vendor/bin/phpunit` directly with the files you are testing.
+
